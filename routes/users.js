@@ -1,7 +1,17 @@
 const router = require('koa-router')();
 
 const UserHelper = require('../dbHelper/userHelper');
+const errorCode = require('../common/errorCode')
 
+
+router.get('/api/hasuser', async function (ctx, next) {
+  const {username} = ctx.request.query;
+  let existedUser = await UserHelper.findOne({username});
+  ctx.response.body = {
+    code : 0,
+    data : existedUser ? true : false
+  }
+});
 /*注册
 * 请求方式 post
 * 参数：{
@@ -22,23 +32,18 @@ const UserHelper = require('../dbHelper/userHelper');
 * }
 * */
 router.post('/api/register', async function (ctx, next) {
-  const {username} = ctx.request.query;
+  const {username} = ctx.request.body;
+  console.log(ctx.request.body)
   let existedUser = await UserHelper.findOne({username});
   if (existedUser) {
     ctx.response.body = {
       code : 1,
-      errMsg : '用户名已存在！'
+      errMsg : errorCode[1]
     }
   } else {
-    let savedUser = await UserHelper.save(ctx.request.query);
+    let savedUser = await UserHelper.save(ctx.request.body);
     if (savedUser) {
       const data = {username, _id: savedUser._id};
-
-      ctx.cookies.set('userid', savedUser._id,{
-        maxAge:1000*60*60*24,
-        overwrite:true
-      });
-
       ctx.response.body = {
         code : 0,
         data
@@ -46,7 +51,7 @@ router.post('/api/register', async function (ctx, next) {
     } else {
       ctx.response.body = {
         code : 4,
-        errMsg : '未知错误！'
+        errMsg : errorCode[4]
       };
     }
   }
@@ -67,7 +72,7 @@ router.post('/api/register', async function (ctx, next) {
 *     username : 'xxx'
 *   }
 *   失败： {
-*     code : 1,
+*     code : 2,
 *     error : '用户名或密码错误'
 *   }
 * }
