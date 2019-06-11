@@ -6,6 +6,9 @@ let UserHelper = {};
 
 UserHelper.findOne = function (obj = {}) {
     return new Promise((resolve, reject) => {
+        if (obj.password) {
+            obj.password = md5(obj.password);
+        }
         UserModel.findOne(obj, function (err, user) {
             if (err) {
                 reject(err);

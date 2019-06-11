@@ -14,6 +14,7 @@ conn.on('connected', function () {
 
 /*用户*/
 const userSchema = mongoose.Schema({
+    avatar : {type : String, require : true},
     username : {type : String, required : true},
     password : {type : String, required : true},
     favorates : {type : Array, default : []}

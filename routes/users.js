@@ -33,7 +33,6 @@ router.get('/api/hasuser', async function (ctx, next) {
 * */
 router.post('/api/register', async function (ctx, next) {
   const {username} = ctx.request.body;
-  console.log(ctx.request.body)
   let existedUser = await UserHelper.findOne({username});
   if (existedUser) {
     ctx.response.body = {
@@ -43,10 +42,18 @@ router.post('/api/register', async function (ctx, next) {
   } else {
     let savedUser = await UserHelper.save(ctx.request.body);
     if (savedUser) {
-      const data = {username, _id: savedUser._id};
+      const userObj = {
+        _id : savedUser._id,
+        username : savedUser.username,
+        favorates : savedUser.favorates,
+        avatar : savedUser.avatar
+      };
+
+      ctx.session.userObj = userObj;
+
       ctx.response.body = {
         code : 0,
-        data
+        data : userObj
       };
     } else {
       ctx.response.body = {
@@ -77,5 +84,45 @@ router.post('/api/register', async function (ctx, next) {
 *   }
 * }
 * */
+router.post('/api/login', async function (ctx, next) {
+  const {username, password} = ctx.request.body;
+  let user = await UserHelper.findOne({username, password});
+  if (user) {
+    const userObj = {
+      _id : user._id,
+      username : user.username,
+      favorates : user.favorates,
+      avatar : user.avatar
+    };
+
+    ctx.session.userObj = userObj;
+    ctx.response.body = {
+      code : 0,
+      data : userObj
+    }
+  } else {
+    ctx.response.body = {
+      code : 2,
+      errMsg : errorCode[2]
+    }
+  }
+});
+
+/**
+ * 退出登录
+ */
+router.post('/api/signout', async function(ctx, next) {
+  if (ctx.session.userObj) {
+    ctx.session = null;
+    ctx.response.body = {
+      code : 0
+    }
+  } else {
+    ctx.response.body = {
+      code : 3,
+      errMsg : errorCode[3]
+    }
+  }
+});
 
 module.exports = router;

@@ -5,6 +5,7 @@ const json = require('koa-json');
 const onerror = require('koa-onerror');
 const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger');
+const session = require('koa-session');
 
 const index = require('./routes/index');
 const users = require('./routes/users');
@@ -21,6 +22,17 @@ app.use(bodyparser({
 app.use(json());
 app.use(logger());
 app.use(require('koa-static')(__dirname + '/public'));
+
+app.keys = ['meiju'];
+app.use(session({
+  key : 'sessionId',
+  maxAge : 1000 * 60 * 60 * 24 * 1, //1天
+  overwrite: true,  //是否可以overwrite    (默认default true)
+  httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
+  signed: false,   //签名默认true
+  rolling: false,  //在每次请求时强行设置cookie，这将重置cookie过期时间（默认：false）
+  renew: false,  //(boolean) renew session when session is nearly expired
+}, app));
 
 app.use(views(__dirname + '/views', {
   extension: 'ejs'
