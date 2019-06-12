@@ -26,7 +26,7 @@ app.use(require('koa-static')(__dirname + '/public'));
 app.keys = ['meiju'];
 app.use(session({
   key : 'sessionId',
-  maxAge : 1000 * 60 * 60 * 24 * 1, //1天
+  maxAge : 1000 * 60 * 60 * 24 * 7, //7天
   overwrite: true,  //是否可以overwrite    (默认default true)
   httpOnly: true, //cookie是否只有服务器端可以访问 httpOnly or not (default true)
   signed: false,   //签名默认true

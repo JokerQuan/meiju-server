@@ -33,4 +33,16 @@ UserHelper.save = function (obj = {}) {
     });
 };
 
+UserHelper.update = function (filter, obj = {}) {
+    return new Promise((resolve, reject) => {
+        UserModel.findOneAndUpdate(filter, obj, {new: true}, function (err, user) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(user);
+            }
+        });
+    });
+};
+
 module.exports = UserHelper;

@@ -14,7 +14,9 @@ MeijuHelper.getRecommend = function () {
                     results.push(meiju);
                 }
                 if (results.length === recommeds.length) {
-                    resolve(results.sort());
+                    resolve(results.sort((a, b) => {
+                        return a > b ? 1: -1; 
+                    }));
                 }
             });
         }
