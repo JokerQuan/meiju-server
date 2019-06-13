@@ -1,7 +1,8 @@
 const router = require('koa-router')();
 
 const UserHelper = require('../dbHelper/userHelper');
-const errorCode = require('../common/errorCode')
+const MeijiHelper = require('../dbHelper/meijuHelper');
+const errorCode = require('../common/errorCode');
 
 /**
  * 用户名是否存在
@@ -175,6 +176,45 @@ router.post('/api/cancelStar', async function (ctx, next) {
     ctx.response.body = {
       code : 3,
       errMsg : errorCode[3]
+    }
+  }
+});
+
+
+//我的收藏总数
+router.get('/api/favoratesCount', async (ctx, next) => {
+  //未登录
+  if (!ctx.session || !ctx.session.userObj || !ctx.session.userObj._id) {
+      ctx.response.body = {
+          code : 3,
+          errMsg : errorCode[3]
+      }
+  } else {
+      const user = await UserHelper.findOne({_id : ctx.session.userObj._id});
+      ctx.response.body = {
+        code : 0,
+        data : {count : user.favorates.length}
+      }
+  }
+});
+
+//我的收藏分页查询
+router.get('/api/favorates/:page', async (ctx, next) => {
+  //未登录
+  if (!ctx.session || !ctx.session.userObj || !ctx.session.userObj._id) {
+      ctx.response.body = {
+          code : 3,
+          errMsg : errorCode[3]
+      }
+  } else {
+      const pageSize = 24;
+      const {page} = ctx.params;
+      const user = await UserHelper.findOne({_id : ctx.session.userObj._id});
+      const _ids = user.favorates.slice(page * pageSize, (page + 1) * pageSize);
+      const meijuList = await MeijiHelper.getMeijuListByIds(_ids);
+      ctx.response.body = {
+        code : 0,
+        data : meijuList
     }
   }
 });

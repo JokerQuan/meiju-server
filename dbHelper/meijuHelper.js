@@ -51,4 +51,23 @@ MeijuHelper.getMeijuCount = function (obj = {}) {
     });
 };
 
+
+MeijuHelper.getMeijuListByIds = function (_ids = []) {
+    return new Promise((resolve, reject) => {
+        let results = [];
+        for (let i = 0; i < _ids.length; i++) {
+            MeijuModel.findOne({_id : _ids[i]}, function (err, meiju) {
+                if (err) {
+                    reject(err);
+                } else {
+                    results.push(meiju);
+                }
+                if (results.length === _ids.length) {
+                    resolve(results);
+                }
+            });
+        }
+    });
+};
+
 module.exports = MeijuHelper;
