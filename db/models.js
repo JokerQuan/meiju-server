@@ -49,3 +49,15 @@ const categorySchema = mongoose.Schema({
 });
 const CategoryModel = mongoose.model("category", categorySchema);
 exports.CategoryModel = CategoryModel;
+
+
+/*评论*/
+const commentSchema = mongoose.Schema({
+    user_id : String,
+    content : {type : String, require : true},
+    create_time : {type : String, require : true},
+    awesome : Array,
+    replay_list : Array
+});
+const CommentModel = mongoose.model("comment", commentSchema);
+exports.CommentModel = CommentModel;
