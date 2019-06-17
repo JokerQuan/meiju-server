@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const moment = require('moment');
 
 const errorCode = require('../common/errorCode');
 const CommentHelper = require('../dbHelper/commentHelper');
@@ -39,6 +40,32 @@ router.post('/api/comment', async (ctx, next) => {
         }
     }
 });
+
+
+//删除评论
+router.post('/api/delComment', async (ctx, next) => {
+    if (ctx.session && ctx.session.userObj && ctx.session.userObj.username === 'Admin') {
+        const {_id} = ctx.request.body;
+        const comment = await CommentHelper.removeOne(_id);
+        if (comment && comment._id) {
+            ctx.response.body = {
+                code : 0,
+                data : comment._id
+            }
+        } else {
+            ctx.response.body = {
+                code : 4,
+                errMsg : errorCode[4]
+            }
+        }
+    } else {
+        ctx.response.body = {
+            code : 8,
+            errMsg : errorCode[8]
+        }
+    }
+});
+
 
 //获取评论
 router.get('/api/comment/:page', async (ctx, next) => {
@@ -119,5 +146,32 @@ router.post('/api/awesome', async (ctx, next) => {
     }
 });
 
+//回复评论
+router.post('/api/replay', async (ctx, next) => {
+    const {comment_id, from_id, from_name, to_id, to_name, content} = ctx.request.body;
+    let comment = await CommentHelper.findOne({_id : comment_id});
+    const create_time = moment().valueOf();
+    comment.replay_list.push({
+        create_time,
+        from_id,
+        from_name,
+        to_id,
+        to_name,
+        content
+    });
+    const result = await CommentHelper.update({_id : comment_id}, {replay_list : comment.replay_list});
+    let data = {...result._doc};
+    if (result.user_id !== 'anonymous') {
+        const user = await UserHelper.findOne({_id : result.user_id});
+        data.user_name = user.username;
+        data.user_avatar = user.avatar;
+    } else {
+        data.user_name = '游客';
+    }
+    ctx.response.body = {
+        code : 0,
+        data
+    }
+});
 
 module.exports = router;

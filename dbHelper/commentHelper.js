@@ -16,6 +16,19 @@ CommentHelper.findOne = function (obj = {}) {
     });
 };
 
+CommentHelper.removeOne = function (_id) {
+    return new Promise((resolve, reject) => {
+        if (!_id) {reject();}
+        CommentModel.findOneAndRemove({_id}, function (err, comment) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(comment);
+            }
+        })
+    });
+};
+
 CommentHelper.addComment = function (commentObj = {}) {
     return new Promise((resolve, reject) => {
         commentObj.create_time = moment().valueOf();
@@ -62,11 +75,11 @@ CommentHelper.getCommentCount = function () {
 
 CommentHelper.update = function (filter, obj = {}) {
     return new Promise((resolve, reject) => {
-        CommentModel.findOneAndUpdate(filter, obj, {new: true}, function (err, user) {
+        CommentModel.findOneAndUpdate(filter, obj, {new: true}, function (err, comment) {
             if (err) {
                 reject(err);
             } else {
-                resolve(user);
+                resolve(comment);
             }
         });
     });

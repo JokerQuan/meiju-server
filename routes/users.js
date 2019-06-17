@@ -210,12 +210,19 @@ router.get('/api/favorates/:page', async (ctx, next) => {
       const pageSize = 24;
       const {page} = ctx.params;
       const user = await UserHelper.findOne({_id : ctx.session.userObj._id});
-      const _ids = user.favorates.slice(page * pageSize, (page + 1) * pageSize);
-      const meijuList = await MeijiHelper.getMeijuListByIds(_ids);
-      ctx.response.body = {
-        code : 0,
-        data : meijuList
-    }
+      if (user.favorates.length === 0) {
+        ctx.response.body = {
+          code : 0,
+          data : []
+        }
+      } else {
+        const _ids = user.favorates.slice(page * pageSize, (page + 1) * pageSize);
+        const meijuList = await MeijiHelper.getMeijuListByIds(_ids);
+        ctx.response.body = {
+          code : 0,
+          data : meijuList
+        }
+      }
   }
 });
 
