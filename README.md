@@ -4,6 +4,10 @@ Node.js v10.16.0
 
 npm 6.9.0
 
+### 主要框架
+
+Koa、Koa-session、Mongoose、Moment
+
 ### 开发环境运行
 
 1. 安装 MongoDB、MongoDB Campass（可视化管理数据）
