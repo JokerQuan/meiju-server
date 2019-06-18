@@ -47,11 +47,12 @@ npm 6.9.0
 5. pm2 基本命令
 
     > pm2 list （查看 pm2 启动的进程列表）
+
     > pm2 logs （查看 pm2 启动的进程日志）
+
     > pm2 start|stop id|name （通过进程的 id 或 name 启动/停止进程）
 
 ### 开发计划
 
-    *由*
+    *由前端项目驱动*
     [美剧前端项目](https://github.com/JokerQuan/meiju-client)
-    *驱动*
