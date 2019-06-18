@@ -54,5 +54,4 @@ npm 6.9.0
 
 ### 开发计划
 
-    *由前端项目驱动*
-    [美剧前端项目](https://github.com/JokerQuan/meiju-client)
+*由[美剧前端项目](https://github.com/JokerQuan/meiju-client)驱动*
