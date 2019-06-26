@@ -1,5 +1,7 @@
 const router = require('koa-router')();
+const moment = require('moment');
 
+const errorCode = require('../common/errorCode');
 const MeijuHelper = require('../dbHelper/meijuHelper');
 const CategoryHelper = require('../dbHelper/categoryHelper');
 
@@ -96,6 +98,146 @@ router.get('/api/search/:keyword/:page', async (ctx, next) => {
     ctx.response.body = {
         code : 0,
         data : meijuList
+    }
+});
+
+//评论
+router.post('/api/meiju/comment', async (ctx, next) => {
+    const {meijuID, content} = ctx.request.body;
+    let meiju = await MeijuHelper.findOne({_id: meijuID});
+    let user = {};
+    if (ctx.session && ctx.session.userObj && ctx.session.userObj._id) {
+        user = {
+            _id : ctx.session.userObj._id,
+            username : ctx.session.userObj.username,
+            user_avatar : ctx.session.userObj.avatar
+        }
+    } else {
+        user = {
+            _id : 'anonymous',
+            username : '游客',
+            user_avatar : 0
+        }
+    }
+    const create_time = moment().valueOf();
+    const comment = {
+        _id : user._id + '_' + create_time,
+        user_id : user._id,
+        user_name : user.username,
+        user_avatar : user.user_avatar,
+        content,
+        create_time,
+        replay_list : [],
+        awesome : []
+    }
+    meiju.comment_list.unshift(comment);
+    const result = await MeijuHelper.update({_id : meijuID}, meiju);
+    ctx.response.body = {
+        code : 0,
+        data : result
+    }
+});
+
+//删除评论
+router.post('/api/meiju/delComment', async (ctx, next) => {
+    const {meijuID, commentID} = ctx.request.body;
+    let meiju = await MeijuHelper.findOne({_id: meijuID});
+    if (ctx.session && ctx.session.userObj && ctx.session.userObj.username === 'Admin') {
+        let {comment_list} = meiju;
+        let index = null;
+        for (let i = 0; i < comment_list.length; i++) {
+            if (commentID === comment_list[i]._id) {
+                index = i;
+            }
+        }
+        if (index !== null) {
+            comment_list.splice(index, 1);
+            const data = await MeijuHelper.update({_id:meijuID}, {comment_list});
+            ctx.response.body = {
+                code : 0,
+                data
+            }
+        } else {
+            ctx.response.body = {
+                code : 9,
+                errMsg : errorCode[9]
+            }
+        }
+    } else {
+        ctx.response.body = {
+            code : 8,
+            errMsg : errorCode[8]
+        }
+    }
+});
+
+router.post('/api/meiju/awesome', async (ctx, next) => {
+    const {meijuID, commentId, clientIP} = ctx.request.body;
+    const isLogin = ctx.session && ctx.session.userObj && ctx.session.userObj._id;
+    const meiju = await MeijuHelper.findOne({_id: meijuID});
+    let comment = {};
+    meiju.comment_list.map(_comment => {
+        if (commentId === _comment._id) {
+            comment = _comment;
+        }
+        return _comment;
+    });
+    
+    let isAwesome = false;
+    if (isLogin) {
+        isAwesome = comment.awesome.indexOf(ctx.session.userObj._id) !== -1;
+    } else {
+        isAwesome = comment.awesome.indexOf(clientIP) !== -1;
+    }
+
+    if (!isAwesome) {
+        if (isLogin) {
+            comment.awesome.push(ctx.session.userObj._id);
+        } else {
+            comment.awesome.push(clientIP);
+        }
+    } else {
+        if (isLogin) {
+            comment.awesome.splice(comment.awesome.indexOf(ctx.session.userObj._id), 1);
+        } else {
+            comment.awesome.splice(comment.awesome.indexOf(clientIP), 1);
+        }
+    }
+
+    const comment_list = meiju.comment_list.map(_comment => {
+        if (commentId === _comment._id) {
+            return comment;
+        }
+        return _comment;
+    });
+
+    const data = await MeijuHelper.update({_id : meijuID}, {comment_list});
+    ctx.response.body = {
+        code : 0,
+        data
+    }
+});
+
+router.post('/api/meiju/replay', async (ctx, next) => {
+    const {meijuID, comment_id, from_id, from_name, to_id, to_name, content} = ctx.request.body;
+    const meiju = await MeijuHelper.findOne({_id: meijuID});
+    const comment_list = meiju.comment_list.map(comment => {
+        if (comment_id === comment._id) {
+            comment.replay_list.push({
+                from_id,
+                from_name,
+                to_id,
+                to_name,
+                content,
+                create_time : moment().valueOf()
+            });
+        }
+        return comment;
+    });
+    const data = await MeijuHelper.update({_id:meijuID}, {comment_list});
+    ctx.response.body = {
+        code : 0,
+        data
     }
 });
 

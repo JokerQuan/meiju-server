@@ -35,7 +35,8 @@ const meijuSchema = mongoose.Schema({
     type:String,        //类型
     tags:String,         //标签
     translator:String,  //翻译
-    files: Array        //下载列表
+    files: Array,       //下载列表
+    comment_list: Array //评论列表
 });
 const MeijuModel = mongoose.model("Meiju", meijuSchema);
 exports.MeijuModel = MeijuModel;

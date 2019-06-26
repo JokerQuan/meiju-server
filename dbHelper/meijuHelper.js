@@ -70,4 +70,28 @@ MeijuHelper.getMeijuListByIds = function (_ids = []) {
     });
 };
 
+MeijuHelper.findOne = function (obj = {}) {
+    return new Promise((resolve, reject) => {
+        MeijuModel.findOne(obj, function (err, meiju) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(meiju);
+            }
+        })
+    });
+};
+
+MeijuHelper.update = function (filter, obj) {
+    return new Promise((resolve, reject) => {
+        MeijuModel.findOneAndUpdate(filter, obj, {new: true}, function (err, meiju) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(meiju);
+            }
+        });
+    });
+}
+
 module.exports = MeijuHelper;
