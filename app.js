@@ -12,6 +12,7 @@ const users = require('./routes/users');
 const category = require('./routes/category');
 const meiju = require('./routes/meiju');
 const comment = require('./routes/comment');
+const statistics = require('./routes/statistics');
 
 // error handler
 onerror(app);
@@ -53,6 +54,8 @@ app.use(users.routes(), users.allowedMethods());
 app.use(category.routes(), category.allowedMethods());
 app.use(meiju.routes(), meiju.allowedMethods());
 app.use(comment.routes(), comment.allowedMethods());
+app.use(comment.routes(), comment.allowedMethods());
+app.use(statistics.routes(), statistics.allowedMethods());
 
 // error-handling
 app.on('error', (err, ctx) => {
