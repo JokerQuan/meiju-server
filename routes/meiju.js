@@ -17,7 +17,32 @@ router.get('/api/recommend', async (ctx, next) => {
 //分页查询
 router.get('/api/meiju/:page', async (ctx, next) => {
     const {page} = ctx.params;
-    const meijuList = await MeijuHelper.getMeijuListByPage({}, page);
+    const {type, area, tags, year} = ctx.request.query;
+    let filters = [];
+    if (type) {
+        const reg = new RegExp(type,'i');
+        filters.push({type:{$regex:reg}});
+    }
+    if (area) {
+        const reg = new RegExp(area,'i');
+        filters.push({area:{$regex:reg}});
+    }
+    if (tags) {
+        const tagList = tags.split(',');
+        tagList.map(tag => {
+            const reg = new RegExp(tag,'i');
+            filters.push({tags : {$regex:reg}});
+            return tag;
+        })
+    }
+    if (year) {
+        const reg = new RegExp(year,'i');
+        filters.push({birth_date:{$regex:reg}});
+    }
+
+    const filterObj = filters.length > 0 ? {$and : filters} : {};
+
+    const meijuList = await MeijuHelper.getMeijuListByPage(filterObj, page);
     ctx.response.body = {
         code : 0,
         data : meijuList
@@ -26,7 +51,32 @@ router.get('/api/meiju/:page', async (ctx, next) => {
 
 //查询总数
 router.get('/api/meijuCount', async (ctx, next) => {
-    const count = await MeijuHelper.getMeijuCount();
+    const {type, area, tags, year} = ctx.request.query;
+    let filters = [];
+    if (type) {
+        const reg = new RegExp(type,'i');
+        filters.push({type:{$regex:reg}});
+    }
+    if (area) {
+        const reg = new RegExp(area,'i');
+        filters.push({area:{$regex:reg}});
+    }
+    if (tags) {
+        const tagList = tags.split(',');
+        tagList.map(tag => {
+            const reg = new RegExp(tag,'i');
+            filters.push({tags : {$regex:reg}});
+            return tag;
+        })
+    }
+    if (year) {
+        const reg = new RegExp(year,'i');
+        filters.push({birth_date:{$regex:reg}});
+    }
+
+    const filterObj = filters.length > 0 ? {$and : filters} : {};
+
+    const count = await MeijuHelper.getMeijuCount(filterObj);
     ctx.response.body = {
         code : 0,
         data : {count}
