@@ -62,3 +62,15 @@ const commentSchema = mongoose.Schema({
 });
 const CommentModel = mongoose.model("comment", commentSchema);
 exports.CommentModel = CommentModel;
+
+
+/*客户端*/
+const clientSchema = mongoose.Schema({
+    ip : {type : String, require : true},
+    addr_code : {type : String, require : true},
+    addr_name : {type : String, require : true},
+    address : {type : String, require : true},
+    date : {type : String, require : true}
+});
+const ClientModel = mongoose.model("client", clientSchema);
+exports.ClientModel = ClientModel;

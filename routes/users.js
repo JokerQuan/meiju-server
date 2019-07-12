@@ -4,6 +4,9 @@ const UserHelper = require('../dbHelper/userHelper');
 const MeijiHelper = require('../dbHelper/meijuHelper');
 const errorCode = require('../common/errorCode');
 
+const areaList = require('../dbHelper/area_list');
+const ClientHelper = require('../dbHelper/clientHelper');
+
 /**
  * 用户名是否存在
  */
@@ -224,6 +227,26 @@ router.get('/api/favorates/:page', async (ctx, next) => {
         }
       }
   }
+});
+
+//统计客户端信息
+router.post('/api/clinetinfo', async (ctx, next) => {
+  const {ip, address, date} = ctx.request.body;
+  const area = areaList.find(_area => {
+    return address.indexOf(_area.name) !== -1;
+  });
+  const client = {
+    ip,
+    addr_code : area.code,
+    addr_name : area.name,
+    address,
+    date
+  };
+  const data = await ClientHelper.save(client);
+  ctx.response.body = {
+    code : 0,
+    data
+  };
 });
 
 module.exports = router;
