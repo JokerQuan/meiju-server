@@ -242,7 +242,7 @@ router.post('/api/clinetinfo', async (ctx, next) => {
     address,
     date
   };
-  const data = await ClientHelper.save(client);
+  const data = await ClientHelper.update(client);
   ctx.response.body = {
     code : 0,
     data

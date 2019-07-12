@@ -2,10 +2,9 @@ const {ClientModel} = require('../db/models');
 
 let ClientHelper = {};
 
-ClientHelper.save = function (obj = {}) {
+ClientHelper.update = function (obj = {}) {
     return new Promise((resolve, reject) => {
-        let clientModel = new ClientModel(obj);
-        clientModel.save(function (err, client) {
+        ClientModel.findOneAndUpdate({ip:obj.ip}, obj, {upsert:true}, function (err, client) {
             if (err) {
                 reject(err);
             } else {
