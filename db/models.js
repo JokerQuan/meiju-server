@@ -48,7 +48,7 @@ const categorySchema = mongoose.Schema({
     areas : Array,
     types : Array
 });
-const CategoryModel = mongoose.model("category", categorySchema);
+const CategoryModel = mongoose.model("categorys", categorySchema);
 exports.CategoryModel = CategoryModel;
 
 
